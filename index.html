@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>DEAR FRIEND™</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0a0a;
+    font-family: 'Oswald', sans-serif;
+    color: #f2f2f2;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #0a0a0a;
+    border-bottom: 1px solid #2a2a2a;
+    padding: 26px 20px 20px;
+    text-align: center;
+    overflow: hidden;
+  }
+  header .logo {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 42px;
+    letter-spacing: -2px;
+    transform: scaleY(1.35) scaleX(0.92);
+    display: inline-block;
+    background: linear-gradient(100deg, #ffffff 20%, #ff2fb0 45%, #c9c9c9 55%, #ffffff 80%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 30px rgba(255, 47, 176, 0.25);
+  }
+  header .tm { font-size: 14px; vertical-align: super; -webkit-text-fill-color: #ff2fb0; }
+  header .sub {
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #888;
+  }
+  header .sub b { color: #ff2fb0; }
+  header a.admin-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    color: #555;
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+  header a.admin-link:hover { color: #ff2fb0; }
+
+  main {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .grid {
+    column-count: 2;
+    column-gap: 10px;
+  }
+  @media (min-width: 640px) { .grid { column-count: 3; } }
+  @media (min-width: 960px) { .grid { column-count: 4; } }
+  @media (min-width: 1280px) { .grid { column-count: 5; } }
+
+  .tile {
+    break-inside: avoid;
+    margin-bottom: 10px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid #2c2c2c;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 12px;
+    min-height: 140px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rise 0.5s ease forwards;
+  }
+  .tile img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  .tile span.txt { position: relative; z-index: 1; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .tile.has-img { color: #fff; }
+  .tile.has-img::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%);
+    z-index: 0;
+  }
+
+  .tile.flash {
+    background: repeating-linear-gradient(115deg, #151515, #151515 2px, #1c1c1c 2px, #1c1c1c 4px);
+  }
+  .tile.holo {
+    background: conic-gradient(from 180deg, #ff2fb0, #7b5cff, #2fe0ff, #ff2fb0);
+    color: #0a0a0a;
+    font-weight: 700;
+  }
+  .tile.mono { background: #141414; }
+  .tile.paper {
+    background: #f2ede4;
+    color: #0a0a0a;
+    font-weight: 700;
+  }
+
+  .tile .stamp {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    background: #ff2fb0;
+    color: #0a0a0a;
+    border-radius: 2px;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 13px;
+  }
+  .empty a { color: #ff2fb0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DEAR&nbsp;FRIEND<span class="tm">™</span></div>
+  <div class="sub">exclusive · <b>backstage</b> · uncensored</div>
+  <a class="admin-link" href="admin.html">+ добавить пост</a>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">
+    Постов пока нет. <a href="admin.html">Добавь первый →</a>
+  </div>
+</main>
+
+<script>
+  const grid = document.getElementById('grid');
+  const emptyMsg = document.getElementById('empty');
+
+  function renderTile(post, index) {
+    const tile = document.createElement('div');
+    tile.className = 'tile ' + (post.style || 'mono') + (post.image ? ' has-img' : '');
+    tile.style.animationDelay = (index * 0.04) + 's';
+
+    let html = '';
+    if (post.stamp) html += `<span class="stamp">${post.stamp}</span>`;
+    if (post.image) html += `<img src="${post.image}" alt="">`;
+    html += `<span class="txt">${post.caption || ''}</span>`;
+    tile.innerHTML = html;
+    return tile;
+  }
+
+  fetch('content.json?_=' + Date.now())
+    .then(res => res.json())
+    .then(posts => {
+      if (!posts.length) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      // новые посты сверху
+      posts.slice().reverse().forEach((post, i) => {
+        grid.appendChild(renderTile(post, i));
+      });
+    })
+    .catch(() => {
+      emptyMsg.textContent = 'Не смог загрузить content.json — проверь, что файл лежит рядом с index.html.';
+      emptyMsg.style.display = 'block';
+    });
+</script>
+
+</body>
+</html>

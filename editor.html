@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Визуальный редактор — DEAR FRIEND</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+<link rel="stylesheet" href="https://unpkg.com/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.css">
+<style>
+  html, body { margin: 0; height: 100%; font-family: -apple-system, sans-serif; }
+  #topbar {
+    height: 46px;
+    background: #0a0a0a;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  #topbar .title { font-weight: 700; letter-spacing: 0.5px; }
+  #topbar .hint { color: #999; font-size: 11px; margin-left: 10px; }
+  #topbar button {
+    background: #ff2fb0;
+    color: #0a0a0a;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #topbar button.secondary { background: #2a2a2a; color: #fff; }
+  #gjs { height: calc(100% - 46px); }
+
+  /* делаем панель менеджера слоёв и стилей чуть шире и читаемей */
+  .gjs-one-bg { background-color: #1c1c1c; }
+  .gjs-two-color { color: #eee; }
+  .gjs-block { font-size: 11px !important; min-height: 70px; }
+  .gjs-pn-panel.gjs-pn-views-container { width: 280px; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div style="display:flex; align-items:center;">
+    <span class="title">🎨 Визуальный редактор</span>
+    <span class="hint">двигай / тяни за уголок, чтобы менять размер / клик правой кнопкой — доп. действия</span>
+  </div>
+  <div>
+    <button class="secondary" id="btn-code">Код</button>
+    <button id="btn-export">Скачать HTML</button>
+  </div>
+</div>
+
+<div id="gjs"></div>
+
+<script src="https://unpkg.com/grapesjs"></script>
+<script src="https://unpkg.com/grapesjs-preset-webpage/dist/grapesjs-preset-webpage.min.js"></script>
+<script>
+const editor = grapesjs.init({
+  container: '#gjs',
+  height: '100%',
+  fromElement: false,
+  storageManager: { type: 'local', autosave: true, stepsBeforeSave: 1 },
+  plugins: ['grapesjs-preset-webpage'],
+  pluginsOpts: {
+    'grapesjs-preset-webpage': {
+      blocksBasicOpts: { flexGrid: true },
+      navbarOpts: false
+    }
+  },
+  deviceManager: {
+    devices: [
+      { name: 'Десктоп', width: '' },
+      { name: 'Планшет', width: '768px', widthMedia: '992px' },
+      { name: 'Телефон', width: '375px', widthMedia: '575px' }
+    ]
+  },
+  canvas: {
+    styles: [
+      'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap'
+    ]
+  }
+});
+
+// ---- Разрешаем менять размер и свободно перетаскивать ЛЮБОЙ блок ----
+editor.DomComponents.addType('default', {
+  model: {
+    defaults: {
+      resizable: {
+        tl: 1, tc: 1, tr: 1, cl: 1, cr: 1, bl: 1, bc: 1, br: 1,
+        keyWidth: 'width', keyHeight: 'height'
+      },
+      draggable: true,
+      droppable: true,
+      stylable: true
+    }
+  }
+});
+
+// ---- Расширенный менеджер стилей: позиция/размер/типографика/оформление ----
+editor.StyleManager.addSector('position-size', {
+  name: 'Позиция и размер',
+  open: true,
+  properties: [
+    { property: 'position', type: 'select', options: [
+      { value: 'static', name: 'Обычная (в потоке)' },
+      { value: 'relative', name: 'Relative' },
+      { value: 'absolute', name: 'Свободная (absolute)' }
+    ]},
+    { property: 'top', type: 'integer', units: ['px','%'], defaults: 0 },
+    { property: 'left', type: 'integer', units: ['px','%'], defaults: 0 },
+    { property: 'width', type: 'integer', units: ['px','%'] },
+    { property: 'height', type: 'integer', units: ['px','%'] },
+    { property: 'transform', type: 'text', label: 'Поворот (напр. rotate(5deg))' }
+  ]
+}, { at: 0 });
+
+// ---- Стартовый контент ----
+editor.setStyle(`
+  body { background:#0a0a0a; color:#f2f2f2; font-family:'Oswald',sans-serif; margin:0; }
+`);
+
+editor.setComponents(`
+  <header style="text-align:center; padding:26px 20px 20px; border-bottom:1px solid #2a2a2a;">
+    <div style="font-family:'Archivo Black',sans-serif; font-size:42px; letter-spacing:-2px; transform:scaleY(1.35) scaleX(0.92); display:inline-block; background:linear-gradient(100deg,#fff 20%,#ff2fb0 45%,#c9c9c9 55%,#fff 80%); -webkit-background-clip:text; background-clip:text; color:transparent;">
+      DEAR&nbsp;FRIEND<span style="font-size:14px; vertical-align:super; -webkit-text-fill-color:#ff2fb0;">™</span>
+    </div>
+    <div style="margin-top:6px; font-size:10px; letter-spacing:4px; text-transform:uppercase; color:#888;">
+      exclusive · <b style="color:#ff2fb0;">backstage</b> · uncensored
+    </div>
+  </header>
+
+  <div id="canvas-area" style="position:relative; display:flex; flex-wrap:wrap; gap:10px; padding:20px; max-width:1300px; margin:0 auto; min-height:500px;">
+
+    <div class="tile" style="width:200px; height:180px; background:repeating-linear-gradient(115deg,#151515,#151515 2px,#1c1c1c 2px,#1c1c1c 4px); border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#f2f2f2;">
+      <span style="position:absolute; margin:-30px 0 0 0; font-family:'Archivo Black',sans-serif; font-size:9px; padding:2px 6px; background:#ff2fb0; color:#0a0a0a; border-radius:2px;">EXCLUSIVE</span>
+      toxic energy only
+    </div>
+
+    <div class="tile" style="width:200px; height:230px; background:conic-gradient(from 180deg,#ff2fb0,#7b5cff,#2fe0ff,#ff2fb0); border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#0a0a0a; font-weight:700;">
+      runway ready
+    </div>
+
+    <img class="tile" src="https://placehold.co/200x160/151515/ff2fb0?text=твоё+фото" style="width:200px; height:160px; object-fit:cover; border:1px solid #2c2c2c;" />
+
+    <div class="tile" style="width:200px; height:150px; background:#141414; border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#f2f2f2;">
+      archive: 2003
+    </div>
+
+    <div class="tile" style="width:200px; height:200px; background:#f2ede4; border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#0a0a0a; font-weight:700;">
+      crystal encrusted
+    </div>
+
+  </div>
+`);
+
+// ---- Доп. блоки в панели слева ----
+const bm = editor.BlockManager;
+
+bm.add('tile-flash', {
+  label: 'Плитка: плёнка',
+  category: 'Плитки',
+  content: `<div class="tile" style="width:200px; height:180px; background:repeating-linear-gradient(115deg,#151515,#151515 2px,#1c1c1c 2px,#1c1c1c 4px); border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#f2f2f2;">новая подпись</div>`
+});
+
+bm.add('tile-holo', {
+  label: 'Плитка: голограмма',
+  category: 'Плитки',
+  content: `<div class="tile" style="width:200px; height:200px; background:conic-gradient(from 180deg,#ff2fb0,#7b5cff,#2fe0ff,#ff2fb0); border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#0a0a0a; font-weight:700;">новая подпись</div>`
+});
+
+bm.add('tile-paper', {
+  label: 'Плитка: бумага',
+  category: 'Плитки',
+  content: `<div class="tile" style="width:200px; height:190px; background:#f2ede4; border:1px solid #2c2c2c; display:flex; align-items:flex-end; padding:12px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#0a0a0a; font-weight:700;">новая подпись</div>`
+});
+
+bm.add('tile-image', {
+  label: 'Плитка: своя картинка',
+  category: 'Плитки',
+  content: `<img class="tile" src="https://placehold.co/200x180/151515/ff2fb0?text=фото" style="width:200px; height:180px; object-fit:cover; border:1px solid #2c2c2c;" />`
+});
+
+bm.add('stamp', {
+  label: 'Штамп (EXCLUSIVE)',
+  category: 'Элементы',
+  content: `<span style="font-family:'Archivo Black',sans-serif; font-size:9px; padding:2px 6px; background:#ff2fb0; color:#0a0a0a; border-radius:2px;">EXCLUSIVE</span>`
+});
+
+// ---- Клик по картинке — сразу открывает менеджер загрузки своих файлов ----
+editor.on('component:selected', (comp) => {
+  if (comp.get('type') === 'image') {
+    editor.runCommand('open-assets', { target: comp });
+  }
+});
+
+// ---- Кнопки в топбаре ----
+document.getElementById('btn-code').addEventListener('click', () => {
+  editor.runCommand('core:open-code');
+});
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const html = editor.getHtml();
+  const css = editor.getCss();
+  const full = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEAR FRIEND</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<style>${css}</style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+  const blob = new Blob([full], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'index.html';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+
+</body>
+</html>

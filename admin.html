@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Админка — DEAR FRIEND</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #0a0a0a;
+    color: #f2f2f2;
+    font-family: 'Oswald', sans-serif;
+    padding: 24px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 20px;
+    color: #ff2fb0;
+    margin: 0 0 4px;
+  }
+  .sub { color: #888; font-size: 12px; margin-bottom: 24px; }
+
+  .box {
+    max-width: 480px;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .box h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ff2fb0;
+    margin: 0 0 14px;
+  }
+  label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #999;
+    margin: 12px 0 5px;
+  }
+  input[type=text], input[type=password], select, textarea {
+    width: 100%;
+    padding: 9px 10px;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #f2f2f2;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  input[type=file] { margin-top: 4px; font-size: 12px; }
+  button {
+    margin-top: 18px;
+    width: 100%;
+    background: #ff2fb0;
+    color: #0a0a0a;
+    border: none;
+    padding: 11px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button.secondary { background: #2a2a2a; color: #fff; margin-top: 8px; }
+
+  #status {
+    max-width: 480px;
+    font-size: 12px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  #status.ok { background: #123321; color: #6fdc9a; display: block; }
+  #status.err { background: #331212; color: #ff8a8a; display: block; }
+  #status.loading { background: #1c1c1c; color: #999; display: block; }
+
+  .hint { font-size: 11px; color: #777; margin-top: 6px; line-height: 1.5; }
+  a { color: #ff2fb0; }
+</style>
+</head>
+<body>
+
+<h1>DEAR FRIEND — админка</h1>
+<div class="sub">твоя личная панель для публикации постов прямо на сайт</div>
+
+<div id="status"></div>
+
+<div class="box">
+  <h2>1. Подключение к GitHub (один раз)</h2>
+
+  <label>GitHub username / организация</label>
+  <input type="text" id="owner" placeholder="например, ivan-petrov">
+
+  <label>Название репозитория</label>
+  <input type="text" id="repo" placeholder="например, site-project">
+
+  <label>Personal Access Token</label>
+  <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx">
+  <div class="hint">
+    Создать: GitHub → фото профиля → Settings → Developer settings →
+    Personal access tokens → Tokens (classic) → Generate new token →
+    отметь галочку <b>repo</b> → Generate. Токен хранится только у тебя
+    в браузере (localStorage), никуда больше не уходит.
+  </div>
+
+  <button class="secondary" onclick="saveConfig()">Сохранить подключение</button>
+</div>
+
+<div class="box">
+  <h2>2. Новый пост</h2>
+
+  <label>Подпись (текст на плитке)</label>
+  <input type="text" id="caption" placeholder="например, toxic energy only">
+
+  <label>Штамп (необязательно)</label>
+  <select id="stamp">
+    <option value="">— без штампа —</option>
+    <option>EXCLUSIVE</option>
+    <option>LEAKED</option>
+    <option>BACKSTAGE</option>
+    <option>PAPARAZZI</option>
+    <option>TOXIC</option>
+  </select>
+
+  <label>Стиль плитки</label>
+  <select id="style">
+    <option value="flash">Плёнка (тёмная)</option>
+    <option value="holo">Голограмма (розово-фиолетовая)</option>
+    <option value="mono">Монохром (чёрная)</option>
+    <option value="paper">Бумага (светлая)</option>
+  </select>
+
+  <label>Картинка (необязательно)</label>
+  <input type="file" id="image" accept="image/*">
+  <div class="hint">Если не загрузишь картинку — будет просто цветная плитка с текстом.</div>
+
+  <button id="publishBtn" onclick="publishPost()">Опубликовать</button>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function loadConfig() {
+    $('owner').value = localStorage.getItem('gh_owner') || '';
+    $('repo').value = localStorage.getItem('gh_repo') || '';
+    $('token').value = localStorage.getItem('gh_token') || '';
+  }
+  function saveConfig() {
+    localStorage.setItem('gh_owner', $('owner').value.trim());
+    localStorage.setItem('gh_repo', $('repo').value.trim());
+    localStorage.setItem('gh_token', $('token').value.trim());
+    showStatus('ok', 'Подключение сохранено в этом браузере.');
+  }
+  loadConfig();
+
+  function showStatus(type, msg) {
+    const el = $('status');
+    el.className = type;
+    el.textContent = msg;
+  }
+
+  function api() {
+    return {
+      owner: localStorage.getItem('gh_owner'),
+      repo: localStorage.getItem('gh_repo'),
+      token: localStorage.getItem('gh_token')
+    };
+  }
+
+  async function ghGet(path) {
+    const { owner, repo, token } = api();
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+      headers: { Authorization: `token ${token}` }
+    });
+    if (!res.ok) throw new Error(`Не нашёл файл ${path} (${res.status})`);
+    return res.json();
+  }
+
+  async function ghPut(path, base64Content, message, sha) {
+    const { owner, repo, token } = api();
+    const body = { message, content: base64Content };
+    if (sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Ошибка записи ${path} (${res.status})`);
+    }
+    return res.json();
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function base64ToUtf8(str) {
+    return decodeURIComponent(escape(atob(str)));
+  }
+
+  async function publishPost() {
+    const { owner, repo, token } = api();
+    if (!owner || !repo || !token) {
+      showStatus('err', 'Сначала сохрани подключение к GitHub (шаг 1).');
+      return;
+    }
+    const caption = $('caption').value.trim();
+    if (!caption) {
+      showStatus('err', 'Напиши подпись для поста.');
+      return;
+    }
+
+    const btn = $('publishBtn');
+    btn.disabled = true;
+    showStatus('loading', 'Публикую...');
+
+    try {
+      let imagePath = '';
+      const file = $('image').files[0];
+
+      if (file) {
+        showStatus('loading', 'Загружаю картинку...');
+        const base64 = await fileToBase64(file);
+        const safeName = Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
+        imagePath = `images/${safeName}`;
+        await ghPut(imagePath, base64, `добавлена картинка: ${safeName}`);
+      }
+
+      showStatus('loading', 'Обновляю список постов...');
+      const contentFile = await ghGet('content.json');
+      const list = JSON.parse(base64ToUtf8(contentFile.content));
+
+      list.push({
+        id: String(Date.now()),
+        style: $('style').value,
+        stamp: $('stamp').value,
+        caption,
+        image: imagePath
+      });
+
+      await ghPut(
+        'content.json',
+        utf8ToBase64(JSON.stringify(list, null, 2)),
+        `новый пост: ${caption}`,
+        contentFile.sha
+      );
+
+      showStatus('ok', 'Готово! Сайт обновится за 30-60 секунд.');
+      $('caption').value = '';
+      $('image').value = '';
+    } catch (e) {
+      showStatus('err', 'Ошибка: ' + e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>
