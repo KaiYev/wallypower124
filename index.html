@@ -22,7 +22,6 @@
     overflow-x: hidden;
   }
 
-  /* декоративные облака — просто слоёные радиальные градиенты, без картинок */
   body::before, body::after {
     content: "";
     position: fixed;
@@ -102,7 +101,7 @@
 
   .grid {
     column-count: 2;
-    column-gap: 14px;
+    column-gap: 22px;
   }
   @media (min-width: 640px) { .grid { column-count: 3; } }
   @media (min-width: 960px) { .grid { column-count: 4; } }
@@ -110,7 +109,7 @@
 
   .tile {
     break-inside: avoid;
-    margin-bottom: 14px;
+    margin-bottom: 22px;
     border-radius: 20px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -124,6 +123,13 @@
     min-height: 140px;
     opacity: 1;
     box-shadow: 0 8px 20px rgba(74, 123, 163, 0.18);
+    transform: rotate(var(--rot, 0deg));
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .tile:hover {
+    transform: rotate(0deg) scale(1.03);
+    box-shadow: 0 14px 30px rgba(74, 123, 163, 0.3);
+    z-index: 5;
   }
   .tile img {
     position: absolute;
@@ -143,7 +149,6 @@
     z-index: 0;
   }
 
-  /* мягкое голубое небо с "облачками" */
   .tile.flash {
     background:
       radial-gradient(30px 18px at 25% 30%, #ffffff 85%, transparent),
@@ -152,17 +157,14 @@
       linear-gradient(160deg, #8fc9ef, #bfe3f7);
     color: #2b3a4a;
   }
-  /* закатное небо — розово-фиолетово-голубой градиент */
   .tile.holo {
     background: linear-gradient(135deg, #ffd6e8, #c9b6ff, #8fc9ef);
     color: #33314f;
   }
-  /* глубокий вечерний синий */
   .tile.mono {
     background: linear-gradient(160deg, #274a6e, #1a3350);
     color: #eaf4fb;
   }
-  /* белое облако-карточка */
   .tile.paper {
     background: #ffffff;
     color: #2b3a4a;
@@ -217,6 +219,11 @@
   function renderTile(post, index) {
     const tile = document.createElement('div');
     tile.className = 'tile ' + (post.style || 'mono') + (post.image ? ' has-img' : '');
+
+    const rot = (Math.random() * 6 - 3).toFixed(1);
+    const offset = Math.floor(Math.random() * 24);
+    tile.style.setProperty('--rot', rot + 'deg');
+    tile.style.marginTop = offset + 'px';
 
     let html = '';
     if (post.stamp) html += `<span class="stamp">${post.stamp}</span>`;
