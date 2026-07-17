@@ -3,78 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>DEAR FRIEND™</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<title>DEAR FRIEND</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     padding: 0;
-    background: #0a0a0a;
-    font-family: 'Oswald', sans-serif;
-    color: #f2f2f2;
+    min-height: 100%;
+    font-family: 'Nunito', sans-serif;
+    color: #2b3a4a;
   }
 
-  body::before {
+  body {
+    background: linear-gradient(180deg, #6bb6ea 0%, #8fc9ef 22%, #b9dff5 48%, #dcf0fb 75%, #f3faff 100%);
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* декоративные облака — просто слоёные радиальные градиенты, без картинок */
+  body::before, body::after {
     content: "";
     position: fixed;
-    inset: 0;
     pointer-events: none;
-    z-index: 100;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    z-index: 0;
+    background-repeat: no-repeat;
+    filter: blur(1px);
+    opacity: 0.9;
+  }
+  body::before {
+    top: -40px; left: -10%;
+    width: 500px; height: 200px;
+    background:
+      radial-gradient(60px 40px at 20% 60%, #ffffff 90%, transparent),
+      radial-gradient(90px 55px at 45% 40%, #ffffff 90%, transparent),
+      radial-gradient(70px 45px at 70% 55%, #ffffff 90%, transparent),
+      radial-gradient(50px 35px at 85% 65%, #ffffff 90%, transparent);
+  }
+  body::after {
+    top: 220px; right: -15%;
+    width: 460px; height: 180px;
+    background:
+      radial-gradient(55px 38px at 25% 55%, #ffffff 85%, transparent),
+      radial-gradient(80px 50px at 50% 40%, #ffffff 85%, transparent),
+      radial-gradient(60px 40px at 75% 60%, #ffffff 85%, transparent);
+    opacity: 0.6;
   }
 
   header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: #0a0a0a;
-    border-bottom: 1px solid #2a2a2a;
-    padding: 26px 20px 20px;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 28px 20px 20px;
     text-align: center;
-    overflow: hidden;
   }
   header .logo {
-    font-family: 'Archivo Black', sans-serif;
-    font-size: 42px;
-    letter-spacing: -2px;
-    transform: scaleY(1.35) scaleX(0.92);
-    display: inline-block;
-    background: linear-gradient(100deg, #ffffff 20%, #ff2fb0 45%, #c9c9c9 55%, #ffffff 80%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 30px rgba(255, 47, 176, 0.25);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 2px 0 #6bb6ea, 0 4px 14px rgba(60, 120, 170, 0.35);
   }
-  header .tm { font-size: 14px; vertical-align: super; -webkit-text-fill-color: #ff2fb0; }
   header .sub {
     margin-top: 6px;
-    font-size: 10px;
-    letter-spacing: 4px;
+    font-size: 12px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: #888;
+    font-weight: 700;
+    color: #4a7ba3;
   }
-  header .sub b { color: #ff2fb0; }
+  header .sub b { color: #ffffff; -webkit-text-stroke: 0.3px #4a7ba3; }
   header a.admin-link {
     display: inline-block;
-    margin-top: 10px;
-    font-size: 10px;
-    color: #555;
+    margin-top: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    background: #6bb6ea;
+    padding: 6px 14px;
+    border-radius: 20px;
     text-decoration: none;
-    letter-spacing: 1px;
+    box-shadow: 0 3px 10px rgba(107, 182, 234, 0.5);
   }
-  header a.admin-link:hover { color: #ff2fb0; }
+  header a.admin-link:hover { background: #4a9bd6; }
 
   main {
+    position: relative;
+    z-index: 1;
     max-width: 1300px;
     margin: 0 auto;
-    padding: 20px 16px 60px;
+    padding: 24px 16px 60px;
   }
 
   .grid {
     column-count: 2;
-    column-gap: 10px;
+    column-gap: 14px;
   }
   @media (min-width: 640px) { .grid { column-count: 3; } }
   @media (min-width: 960px) { .grid { column-count: 4; } }
@@ -82,20 +110,20 @@
 
   .tile {
     break-inside: avoid;
-    margin-bottom: 10px;
-    border-radius: 2px;
+    margin-bottom: 14px;
+    border-radius: 20px;
     overflow: hidden;
-    border: 1px solid #2c2c2c;
+    border: 1px solid rgba(255, 255, 255, 0.6);
     position: relative;
     display: flex;
     align-items: flex-end;
-    font-weight: 500;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    padding: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 14px;
     min-height: 140px;
     opacity: 1;
+    box-shadow: 0 8px 20px rgba(74, 123, 163, 0.18);
   }
   .tile img {
     position: absolute;
@@ -105,58 +133,72 @@
     object-fit: cover;
     z-index: 0;
   }
-  .tile span.txt { position: relative; z-index: 1; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .tile span.txt { position: relative; z-index: 1; }
   .tile.has-img { color: #fff; }
   .tile.has-img::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 60%);
+    background: linear-gradient(to top, rgba(20, 50, 80, 0.55), transparent 60%);
     z-index: 0;
   }
 
+  /* мягкое голубое небо с "облачками" */
   .tile.flash {
-    background: repeating-linear-gradient(115deg, #151515, #151515 2px, #1c1c1c 2px, #1c1c1c 4px);
+    background:
+      radial-gradient(30px 18px at 25% 30%, #ffffff 85%, transparent),
+      radial-gradient(40px 22px at 60% 55%, #ffffff 85%, transparent),
+      radial-gradient(25px 16px at 80% 25%, #ffffff 85%, transparent),
+      linear-gradient(160deg, #8fc9ef, #bfe3f7);
+    color: #2b3a4a;
   }
+  /* закатное небо — розово-фиолетово-голубой градиент */
   .tile.holo {
-    background: conic-gradient(from 180deg, #ff2fb0, #7b5cff, #2fe0ff, #ff2fb0);
-    color: #0a0a0a;
-    font-weight: 700;
+    background: linear-gradient(135deg, #ffd6e8, #c9b6ff, #8fc9ef);
+    color: #33314f;
   }
-  .tile.mono { background: #141414; }
+  /* глубокий вечерний синий */
+  .tile.mono {
+    background: linear-gradient(160deg, #274a6e, #1a3350);
+    color: #eaf4fb;
+  }
+  /* белое облако-карточка */
   .tile.paper {
-    background: #f2ede4;
-    color: #0a0a0a;
-    font-weight: 700;
+    background: #ffffff;
+    color: #2b3a4a;
+    box-shadow: 0 10px 24px rgba(74, 123, 163, 0.22);
   }
 
   .tile .stamp {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 10px;
+    left: 10px;
     z-index: 2;
-    font-family: 'Archivo Black', sans-serif;
-    font-size: 9px;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    padding: 2px 6px;
-    background: #ff2fb0;
-    color: #0a0a0a;
-    border-radius: 2px;
+    padding: 3px 9px;
+    background: #ffffff;
+    color: #4a7ba3;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(74, 123, 163, 0.3);
   }
 
   .empty {
     text-align: center;
     padding: 60px 20px;
-    color: #666;
-    font-size: 13px;
+    color: #4a7ba3;
+    font-size: 14px;
+    font-weight: 600;
   }
-  .empty a { color: #ff2fb0; }
+  .empty a { color: #ffffff; background: #6bb6ea; padding: 4px 10px; border-radius: 14px; text-decoration: none; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">DEAR&nbsp;FRIEND<span class="tm">™</span></div>
+  <div class="logo">Dear Friend</div>
   <div class="sub">exclusive · <b>backstage</b> · uncensored</div>
   <a class="admin-link" href="admin.html">+ добавить пост</a>
 </header>
@@ -175,7 +217,6 @@
   function renderTile(post, index) {
     const tile = document.createElement('div');
     tile.className = 'tile ' + (post.style || 'mono') + (post.image ? ' has-img' : '');
-    tile.style.animationDelay = (index * 0.04) + 's';
 
     let html = '';
     if (post.stamp) html += `<span class="stamp">${post.stamp}</span>`;
@@ -192,7 +233,6 @@
         emptyMsg.style.display = 'block';
         return;
       }
-      // новые посты сверху
       posts.slice().reverse().forEach((post, i) => {
         grid.appendChild(renderTile(post, i));
       });
